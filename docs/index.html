@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather — AA Elements</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',sans-serif;
+  background:#0e0e0e;color:#e8e8e8;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  padding:24px;overflow-x:hidden;
+}
+.ambient-grid{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+.container{position:relative;z-index:1;width:100%;max-width:600px}
+
+/* header */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;margin-bottom:24px;
+  background:rgba(20,20,20,0.65);backdrop-filter:blur(32px) saturate(1.6);
+  -webkit-backdrop-filter:blur(32px) saturate(1.6);
+  border:1px solid rgba(255,255,255,.08);border-radius:100px;
+  box-shadow:0 8px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);
+}
+header .logo{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;
+  background:linear-gradient(135deg,#00d4ff,#5b0fbe);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+header .logo span{color:var(--text-muted);-webkit-text-fill-color:#888}
+
+/* search */
+.search-wrap{
+  display:flex;gap:8px;margin-bottom:24px;
+}
+.search-wrap input{
+  flex:1;padding:14px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.08);
+  background:rgba(20,20,20,0.5);backdrop-filter:blur(16px) saturate(1.4);
+  -webkit-backdrop-filter:blur(16px) saturate(1.4);
+  color:#fff;font-family:'Inter',sans-serif;font-size:.9rem;outline:none;
+  transition:border-color .3s;
+}
+.search-wrap input:focus{border-color:#00d4ff;box-shadow:0 0 30px rgba(0,212,255,.1)}
+.search-wrap input::placeholder{color:#666}
+.search-wrap button{
+  width:50px;height:50px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,#00d4ff,#5b0fbe);
+  color:#fff;font-size:1.2rem;cursor:pointer;
+  transition:all .3s cubic-bezier(.22,1,.36,1);
+  display:flex;align-items:center;justify-content:center;
+}
+.search-wrap button:hover{transform:scale(1.06);box-shadow:0 8px 30px rgba(0,212,255,.2)}
+.search-wrap button:active{transform:scale(.96)}
+
+/* weather card */
+.weather-card{
+  background:rgba(20,20,20,0.5);backdrop-filter:blur(20px) saturate(1.4);
+  -webkit-backdrop-filter:blur(20px) saturate(1.4);
+  border:1px solid rgba(255,255,255,.06);border-radius:24px;
+  padding:32px 24px;box-shadow:0 24px 80px rgba(0,0,0,.6);
+  transition:all .5s cubic-bezier(.22,1,.36,1);
+  opacity:0;transform:translateY(20px);
+}
+.weather-card.show{opacity:1;transform:translateY(0)}
+.weather-card .city{
+  font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:700;
+  margin-bottom:4px;
+}
+.weather-card .country{font-size:.75rem;color:#888;margin-bottom:16px}
+.weather-card .main{
+  display:flex;align-items:center;gap:16px;margin-bottom:16px;
+}
+.weather-card .temp{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:4rem;font-weight:800;line-height:1;
+  background:linear-gradient(135deg,#00d4ff,#5b0fbe);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.weather-card .desc{
+  font-size:1rem;color:#aaa;text-transform:capitalize;
+}
+.weather-card .details{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;
+}
+.weather-card .detail{
+  text-align:center;padding:16px 8px;
+  background:rgba(255,255,255,.03);border-radius:14px;
+  border:1px solid rgba(255,255,255,.04);
+}
+.weather-card .detail .label{font-size:.65rem;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.weather-card .detail .value{font-size:1.1rem;font-weight:600}
+.weather-card .detail .value.humidity{color:#38bdf8}
+.weather-card .detail .value.wind{color:#a78bfa}
+.weather-card .detail .value.feels{color:#fbbf24}
+
+/* error */
+.error{
+  text-align:center;padding:20px;color:#ef4444;font-size:.9rem;
+  background:rgba(239,68,68,.08);border-radius:16px;border:1px solid rgba(239,68,68,.15);
+  margin-top:16px;display:none;
+}
+.error.show{display:block}
+
+/* loading */
+.loading{
+  text-align:center;padding:40px;display:none;
+}
+.loading.show{display:block}
+.loading .spinner{
+  width:32px;height:32px;border:3px solid rgba(255,255,255,.06);
+  border-top-color:#00d4ff;border-radius:50%;
+  animation:spin .8s linear infinite;margin:0 auto 12px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{font-size:.8rem;color:#666}
+
+/* recent searches */
+.recent{
+  margin-top:16px;display:none;
+}
+.recent.show{display:block}
+.recent-label{font-size:.7rem;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.recent-tags{display:flex;gap:8px;flex-wrap:wrap}
+.recent-tag{
+  padding:6px 14px;border-radius:20px;font-size:.8rem;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
+  color:#888;cursor:pointer;transition:all .3s;
+}
+.recent-tag:hover{background:rgba(0,212,255,.1);border-color:rgba(0,212,255,.2);color:#00d4ff}
+
+/* empty state */
+.empty-state{
+  text-align:center;padding:60px 20px;color:#555;
+}
+.empty-state .icon{font-size:3rem;margin-bottom:16px;opacity:.3}
+.empty-state h3{font-size:1.1rem;color:#888;margin-bottom:8px;font-weight:600}
+.empty-state p{font-size:.85rem;line-height:1.6}
+
+/* footer */
+footer{margin-top:24px;text-align:center;font-size:.72rem;color:#444;padding:16px}
+
+/* responsive */
+@media(max-width:480px){
+  body{padding:12px}
+  .weather-card{padding:24px 16px}
+  .weather-card .temp{font-size:3rem}
+  .weather-card .details{grid-template-columns:repeat(3,1fr);gap:8px}
+  .weather-card .detail{padding:12px 6px}
+  .weather-card .detail .value{font-size:.95rem}
+  .weather-card .city{font-size:1.3rem}
+}
+</style>
+</head>
+<body>
+
+<div class="ambient-grid"></div>
+
+<div class="container">
+  <header>
+    <div class="logo">Weather<span>.</span></div>
+    <div style="font-size:.7rem;color:#555">AA Elements</div>
+  </header>
+
+  <div class="search-wrap">
+    <input type="text" id="searchInput" placeholder="Search city..." autofocus>
+    <button id="searchBtn" aria-label="Search">⌕</button>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>Fetching weather...</p>
+  </div>
+
+  <div class="error" id="error"></div>
+
+  <div class="empty-state" id="emptyState">
+    <div class="icon">⛅</div>
+    <h3>Check the Weather</h3>
+    <p>Search for a city to see current conditions, temperature, and forecast details.</p>
+  </div>
+
+  <div class="weather-card" id="weatherCard">
+    <div class="city" id="cityName"></div>
+    <div class="country" id="countryName"></div>
+    <div class="main">
+      <img id="weatherIcon" src="" alt="" style="width:72px;height:72px">
+      <div>
+        <div class="temp" id="temperature"></div>
+        <div class="desc" id="description"></div>
+      </div>
+    </div>
+    <div class="details">
+      <div class="detail">
+        <div class="label">Humidity</div>
+        <div class="value humidity" id="humidity">--%</div>
+      </div>
+      <div class="detail">
+        <div class="label">Wind</div>
+        <div class="value wind" id="windSpeed">-- km/h</div>
+      </div>
+      <div class="detail">
+        <div class="label">Feels Like</div>
+        <div class="value feels" id="feelsLike">--°</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="recent" id="recent">
+    <div class="recent-label">Recent</div>
+    <div class="recent-tags" id="recentTags"></div>
+  </div>
+</div>
+
+<footer>Powered by OpenWeatherMap &nbsp;·&nbsp; Weather by AA Elements</footer>
+
+<script>
+const API_KEY = 'YOUR_OPENWEATHERMAP_API_KEY';
+const BASE = 'https://api.openweathermap.org/data/2.5/weather';
+
+const searchInput=document.getElementById('searchInput');
+const searchBtn=document.getElementById('searchBtn');
+const weatherCard=document.getElementById('weatherCard');
+const cityName=document.getElementById('cityName');
+const countryName=document.getElementById('countryName');
+const temperature=document.getElementById('temperature');
+const description=document.getElementById('description');
+const weatherIcon=document.getElementById('weatherIcon');
+const humidity=document.getElementById('humidity');
+const windSpeed=document.getElementById('windSpeed');
+const feelsLike=document.getElementById('feelsLike');
+const errorEl=document.getElementById('error');
+const loadingEl=document.getElementById('loading');
+const emptyState=document.getElementById('emptyState');
+const recent=document.getElementById('recent');
+const recentTags=document.getElementById('recentTags');
+
+let recentCities=JSON.parse(localStorage.getItem('weatherCities')||'[]');
+
+function showLoading(){loadingEl.classList.add('show');weatherCard.classList.remove('show');errorEl.classList.remove('show');emptyState.style.display='none'}
+function hideLoading(){loadingEl.classList.remove('show')}
+
+function showError(msg){
+  errorEl.textContent=msg;
+  errorEl.classList.add('show');
+  weatherCard.classList.remove('show');
+  hideLoading();
+}
+
+function renderRecent(){
+  if(!recentCities.length){recent.classList.remove('show');return}
+  recent.classList.add('show');
+  recentTags.innerHTML=recentCities.map(c=>`<span class="recent-tag" data-city="${c}">${c}</span>`).join('');
+  recentTags.querySelectorAll('.recent-tag').forEach(el=>{
+    el.addEventListener('click',()=>{
+      searchInput.value=el.dataset.city;
+      fetchWeather(el.dataset.city);
+    });
+  });
+}
+
+async function fetchWeather(city){
+  if(!city.trim())return;
+  showLoading();
+  try{
+    const res=await fetch(`${BASE}?q=${encodeURIComponent(city)}&appid=${API_KEY}&units=metric`);
+    const data=await res.json();
+    if(data.cod!==200)throw new Error(data.message||'City not found');
+    displayWeather(data);
+    addRecent(city);
+  }catch(e){
+    if(e.message==='Failed to fetch')showError('Network error. Check your connection and API key.');
+    else showError(e.message.charAt(0).toUpperCase()+e.message.slice(1));
+  }finally{hideLoading()}
+}
+
+function displayWeather(data){
+  cityName.textContent=data.name;
+  countryName.textContent=data.sys.country;
+  temperature.textContent=`${Math.round(data.main.temp)}°`;
+  description.textContent=data.weather[0].description;
+  weatherIcon.src=`https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`;
+  weatherIcon.alt=data.weather[0].description;
+  humidity.textContent=`${data.main.humidity}%`;
+  windSpeed.textContent=`${Math.round(data.wind.speed*3.6)} km/h`;
+  feelsLike.textContent=`${Math.round(data.main.feels_like)}°`;
+  weatherCard.classList.add('show');
+  emptyState.style.display='none';
+}
+
+function addRecent(city){
+  const c=city.trim();
+  recentCities=recentCities.filter(x=>x.toLowerCase()!==c.toLowerCase());
+  recentCities.unshift(c);
+  if(recentCities.length>5)recentCities.pop();
+  localStorage.setItem('weatherCities',JSON.stringify(recentCities));
+  renderRecent();
+}
+
+searchBtn.addEventListener('click',()=>fetchWeather(searchInput.value));
+searchInput.addEventListener('keydown',e=>{if(e.key==='Enter')fetchWeather(searchInput.value)});
+
+renderRecent();
+if(recentCities.length)fetchWeather(recentCities[0]);
+</script>
+</body>
+</html>
