@@ -150,13 +150,27 @@ footer{margin-top:24px;text-align:center;font-size:.72rem;color:#444;padding:16p
 
 /* responsive */
 @media(max-width:480px){
-  body{padding:12px}
-  .weather-card{padding:24px 16px}
-  .weather-card .temp{font-size:3rem}
-  .weather-card .details{grid-template-columns:repeat(3,1fr);gap:8px}
-  .weather-card .detail{padding:12px 6px}
-  .weather-card .detail .value{font-size:.95rem}
-  .weather-card .city{font-size:1.3rem}
+  body{padding:10px}
+  .container{padding:0 4px}
+  .weather-card{padding:20px 14px;border-radius:20px}
+  .weather-card .temp{font-size:2.8rem}
+  .weather-card .details{grid-template-columns:repeat(3,1fr);gap:6px}
+  .weather-card .detail{padding:10px 6px;border-radius:12px}
+  .weather-card .detail .value{font-size:.9rem}
+  .weather-card .detail .label{font-size:.65rem}
+  .weather-card .city{font-size:1.2rem}
+  .weather-card .desc{font-size:.85rem}
+  .search-box input{font-size:.85rem;padding:10px 14px}
+  .search-box button{width:40px;height:40px;font-size:1.1rem}
+  .recent-cities .city-chip{padding:6px 12px;font-size:.72rem}
+  .header h1{font-size:1.1rem}
+  footer{font-size:.65rem;padding:12px}
+}
+@media(max-width:360px){
+  .weather-card{padding:16px 10px}
+  .weather-card .temp{font-size:2.2rem}
+  .weather-card .details{grid-template-columns:repeat(2,1fr)}
+  .weather-card .city{font-size:1rem}
 }
 </style>
 </head>
